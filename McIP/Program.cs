@@ -19,6 +19,7 @@
             StreamReader reader = p.StandardOutput;
 
             string heading = string.Empty;
+            bool headingPrinted = false;
 
             string line;
             while ((line = reader.ReadLine()) != null)
@@ -26,15 +27,39 @@
                 if (!string.IsNullOrEmpty(line) && !line.StartsWith(" ", StringComparison.Ordinal))
                 {
                     heading = line;
+                    headingPrinted = false;
                 }
 
-                if (line.Contains("IP Address"))
+                if (line.ContainsAny("IP Address", "IPv4 Address", "IPv6 Address"))
                 {
-                    Console.WriteLine(heading);
+                    if (!headingPrinted)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine(heading);
+                        headingPrinted = true;
+                    }
+
                     Console.WriteLine(line);
-                    Console.WriteLine();
                 }
             }
+        }
+
+        private static bool ContainsAny(this string target, params string[] values)
+        {
+            if (values == null)
+            {
+                throw new ArgumentNullException("values");
+            }
+
+            foreach (var value in values)
+            {
+                if (target.Contains(value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
